@@ -11,7 +11,7 @@ import RecordsSelectType from '@/components/records/RecordsSelectType.vue';
 import useRecordsStore, { type UserRecord } from '@/stores/records';
 
 const { record } = defineProps<{
-  record: UserRecord & { new: boolean };
+  record: UserRecord;
 }>();
 
 const validationSchema = toTypedSchema(
@@ -34,29 +34,15 @@ const { handleSubmit, errors } = useForm({
   validationSchema,
 });
 
-const { value: badges } = useField<string>(
-  'badges',
-  {},
-  { initialValue: record.badges.map((badge) => badge.text).join(';') },
-);
+const { value: badges } = useField<string>('badges');
 const { value: type } = useField<'local' | 'ldap'>('type', {}, { initialValue: record.type });
-const { value: login } = useField<string>('login', {}, { initialValue: record.login });
-const { value: password } = useField<string | null>(
-  'password',
-  {},
-  { initialValue: record.password },
-);
+const { value: login } = useField<string>('login');
+const { value: password } = useField<string | null>('password');
 
 watch(
   type,
   (newType) => {
-    if (newType === 'ldap') {
-      password.value = null;
-    } else if (record.password) {
-      password.value = record.password;
-    } else {
-      password.value = '';
-    }
+    password.value = newType === 'ldap' ? null : '';
   },
   { immediate: true },
 );
@@ -70,29 +56,13 @@ function getBadgesFromString(badgesString: string | undefined) {
 
 const recordsStore = useRecordsStore();
 
-function saveRecord(data: UserRecord) {
-  if (record.new) recordsStore.saveNewRecord(data);
-  else recordsStore.changeSavedRecord(data);
-}
-
 const checkValues = handleSubmit((values) => {
   if (!errors.value.badges && !errors.value.type && !errors.value.login && !errors.value.password) {
     const badges = getBadgesFromString(values.badges);
-    const recordData = {
-      id: record.id,
-      type: values.type,
-      login: values.login,
-      password: values.password,
-      badges,
-    };
-    saveRecord(recordData);
+    const password = values.password ? values.password : null;
+    recordsStore.saveNewRecord({ ...values, id: record.id, badges, password });
   }
 });
-
-function removeRecord() {
-  if (record.new) recordsStore.removeNewRecord(record.id);
-  else recordsStore.removeSavedRecord(record.id);
-}
 </script>
 
 <template>
@@ -132,6 +102,6 @@ function removeRecord() {
       <span class="text-sm text-destructive">{{ errors.password }}</span>
     </div>
 
-    <RecordsRemoveButton class="h-9" @click.prevent="removeRecord" />
+    <RecordsRemoveButton class="h-9" @click.prevent="recordsStore.removeNewRecord(record.id)" />
   </form>
 </template>

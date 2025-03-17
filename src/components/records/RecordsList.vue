@@ -1,10 +1,17 @@
 <script setup lang="ts">
+import { computed } from 'vue';
 import { vAutoAnimate } from '@formkit/auto-animate';
 
 import RecordsItem from '@/components/records/RecordsItem.vue';
 import useRecordsStore from '@/stores/records';
 
 const recordsStore = useRecordsStore();
+
+const records = computed(() => {
+  return recordsStore.savedRecords
+    .map((record) => ({ ...record, new: false }))
+    .concat(recordsStore.newRecords.map((record) => ({ ...record, new: true })));
+});
 </script>
 
 <template>
@@ -15,6 +22,6 @@ const recordsStore = useRecordsStore();
       <p class="text-neutral-400">Логин</p>
       <p class="text-neutral-400">Пароль</p>
     </div>
-    <RecordsItem v-for="record in recordsStore.records" :key="record.id" :record="record" />
+    <RecordsItem v-for="record in records" :key="record.id" :record="record" />
   </div>
 </template>

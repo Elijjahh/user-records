@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import { useLocalStorage } from '@vueuse/core';
+import { ref } from 'vue';
 
 export type Badge = { text: string };
 
@@ -26,27 +27,42 @@ function createRecord(): UserRecord {
 }
 
 const useRecordsStore = defineStore('records', () => {
-  const records = useLocalStorage<UserRecord[]>('user-records', [createRecord()]);
+  const savedRecords = useLocalStorage<UserRecord[]>('user-records', []);
+  const newRecords = ref<UserRecord[]>([]);
 
-  function addRecord() {
-    records.value.push(createRecord());
+  function addNewRecord() {
+    newRecords.value.push(createRecord());
   }
 
-  function removeRecord(id: number) {
-    const index = records.value.findIndex((r) => r.id === id);
-    records.value.splice(index, 1);
+  function saveNewRecord(record: UserRecord) {
+    const index = newRecords.value.findIndex((r) => r.id === record.id);
+    newRecords.value.splice(index, 1);
+    savedRecords.value.push(record);
   }
 
-  function setRecord(id: number, record: Omit<UserRecord, 'id'>) {
-    const index = records.value.findIndex((r) => r.id === id);
-    records.value[index] = { ...record, id };
+  function removeNewRecord(id: number) {
+    const index = newRecords.value.findIndex((r) => r.id === id);
+    newRecords.value.splice(index, 1);
+  }
+
+  function removeSavedRecord(id: number) {
+    const index = savedRecords.value.findIndex((r) => r.id === id);
+    savedRecords.value.splice(index, 1);
+  }
+
+  function changeSavedRecord(record: UserRecord) {
+    const index = savedRecords.value.findIndex((r) => r.id === record.id);
+    savedRecords.value[index] = record;
   }
 
   return {
-    records,
-    addRecord,
-    removeRecord,
-    setRecord,
+    savedRecords,
+    newRecords,
+    addNewRecord,
+    saveNewRecord,
+    removeNewRecord,
+    removeSavedRecord,
+    changeSavedRecord,
   };
 });
 
