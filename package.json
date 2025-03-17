@@ -2,6 +2,7 @@
   "name": "user-records",
   "version": "0.0.0",
   "private": true,
+  "homepage": "https://elijjahh.github.io/user-records/",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -10,7 +11,9 @@
     "build-only": "vite build",
     "type-check": "vue-tsc --build",
     "lint": "eslint . --fix",
-    "format": "prettier --write src/"
+    "format": "prettier --write src/",
+    "predeploy": "bun run build || npm run build",
+    "deploy": "gh-pages -d dist"
   },
   "dependencies": {
     "@formkit/auto-animate": "^0.8.2",
@@ -18,6 +21,7 @@
     "@vueuse/core": "^13.0.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "gh-pages": "^6.3.0",
     "lucide-vue-next": "^0.482.0",
     "pinia": "^3.0.1",
     "reka-ui": "^2.1.0",
