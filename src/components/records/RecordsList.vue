@@ -1,32 +1,20 @@
 <script setup lang="ts">
-import { UIInput } from '@/components/ui/input';
-import RecordsRemoveButton from '@/components/records/RecordsRemoveButton.vue';
-import RecordsSelectType from '@/components/records/RecordsSelectType.vue';
+import { vAutoAnimate } from '@formkit/auto-animate';
 
-const records = [
-  {
-    badges: 'XXX',
-    type: 'local',
-    login: 'example',
-    password: 'password',
-  },
-];
+import RecordsItem from '@/components/records/RecordsItem.vue';
+import useRecordsStore from '@/stores/records';
+
+const recordsStore = useRecordsStore();
 </script>
 
 <template>
-  <div class="grid gap-2">
-    <div
-      v-for="record in records"
-      :key="record.login"
-      class="grid grid-cols-[repeat(2,_minmax(100px,_1fr))_auto] gap-2 md:grid-cols-[repeat(4,_minmax(100px,_1fr))_auto]"
-    >
-      <UIInput default-value="" placeholder="Значение" />
-      <RecordsSelectType />
-      <UIInput default-value="Elijahh" placeholder="Значение" />
-      <UIInput default-value="password" type="password" />
-      <RecordsRemoveButton
-        class="col-start-3 row-start-1 row-end-3 h-full md:col-auto md:row-auto"
-      />
+  <div v-auto-animate class="flex flex-col gap-2">
+    <div class="grid grid-cols-[repeat(4,_minmax(100px,_1fr))_36px] gap-2">
+      <p class="text-neutral-400">Метки</p>
+      <p class="text-neutral-400">Тип записи</p>
+      <p class="text-neutral-400">Логин</p>
+      <p class="text-neutral-400">Пароль</p>
     </div>
+    <RecordsItem v-for="record in recordsStore.records" :key="record.id" :record="record" />
   </div>
 </template>
